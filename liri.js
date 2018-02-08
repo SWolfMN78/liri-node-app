@@ -11,23 +11,27 @@ var action2 = input[3];
 //the following variables allow access to the keys.
 var keys = require("./keys.js");
 var client = new twitter(keys.twitter);
-// var spotify = new Spotify(keys.spotify);
+var spotify = new Spotify(keys.spotify);
 var omdb = (keys.omdbApiKey.omdb_key);
 
-//A switch command so that it takes commands
-switch (action) {
-    case "my-tweets":
-        myTweets(action2); //If the user enters in text after my-tweets then look up that account.
-        break;
-    case "spotify-this-song":
-        spotifyThisSong();
-        break;
-    case "movie-This":
-        movieThis();
-        break;
-    case "do-what-it-says":
-        doWhatItSays();
-        break;
+RunAction();
+
+function RunAction() {
+    //A switch command so that it takes commands
+    switch (action) {
+        case "my-tweets":
+            myTweets(action2); //If the user enters in text after my-tweets then look up that account.
+            break;
+        case "spotify-this-song":
+            spotifyThisSong();
+            break;
+        case "movie-This":
+            movieThis();
+            break;
+        case "do-what-it-says":
+            doWhatItSays();
+            break;
+    }
 }
 
 /* node liri.js my-tweets:
@@ -51,16 +55,34 @@ function myTweets(action) {
         ~The album that the song is from
     If no song is provided then your program will default to "The Sign" by Ace of Base.*/
 function spotifyThisSong() {
-    /* Load the HTTP library */
-    var http = require("http");
+    var songName = "";
 
-    /* Create an HTTP server to handle responses */
+    //move over all of the entered words to 
+    for (var i = 3; i < input.length; i++) {
+        if (i > 3 && i < input.length) {
+            songName = songName + "+" + input[i];
+        } else {
+            songName += input[i];
+        }
+    }
+    if (songName === "") {
+        songName = "The Sign Ace of Base";
+    }
 
-    http.createServer(function(request, response) {
-        response.writeHead(200, { "Content-Type": "text/plain" });
-        response.write("Hello World");
-        response.end();
-    }).listen(8888);
+    // console.log(keys.spotify);
+
+    spotify.search({ type: 'track', query: songName }, function(err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        }
+
+        // console.log(data);
+        var track = data.tracks.items[0];
+        console.log("Song Name: " + track.artists[0].name);
+        console.log("Song Name: " + track.name);
+        console.log("External Link: " + track.external_urls.spotify);
+        console.log("Album Name: " + track.album.name);
+    });
 }
 
 /*node liri.js movie-this '<movie name here>':
