@@ -1,21 +1,24 @@
-// Load package requiremnets.
+// Load package request requiremnets.
 var dotenv = require("dotenv").config();
 var fs = require("fs");
-
+var twitter = require("twitter")
+var request = require("request");
+var Spotify = require("node-spotify-api"); //adjusted to "S" for node error.
 //pull the information from the cmd prompt based on what was pressed.
 var input = process.argv;
 var action = input[2];
-
+var action2 = input[3];
 //the following variables allow access to the keys.
-var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+var keys = require("./keys.js");
+var client = new twitter(keys.twitter);
+// var spotify = new Spotify(keys.spotify);
+var omdb = (keys.omdbApiKey.omdb_key);
 
-//Make a switch command so that it takes commands
+//A switch command so that it takes commands
 switch (action) {
     case "my-tweets":
-        myTweets();
+        myTweets(action2); //If the user enters in text after my-tweets then look up that account.
         break;
-
     case "spotify-this-song":
         spotifyThisSong();
         break;
@@ -29,12 +32,36 @@ switch (action) {
 
 /* node liri.js my-tweets:
     This will show your last 20 tweets and when they were created at in your terminal/bash window.*/
+function myTweets(action) {
+    if (action == undefined) { action = "DracoMutt78"; }
+    var params = { screen_name: action };
+    client.get('statuses/user_timeline', params, function(error, tweets, response) {
+        if (!error) {
+            for (var i = 0; i < tweets.length; i++) {
+                console.log(tweets[i].created_at + " " + tweets[i].text);
+            }
+            // console.log(tweets.length); //.created_at);
+        }
+    });
+}
 
 /*node liri.js spotify-this-song '<song name here>':
     This will show the following information about the song in your terminal/bash window: 
         ~Artist(s) / ~song's name / ~Preview link of the song from Spotify /
         ~The album that the song is from
     If no song is provided then your program will default to "The Sign" by Ace of Base.*/
+function spotifyThisSong() {
+    /* Load the HTTP library */
+    var http = require("http");
+
+    /* Create an HTTP server to handle responses */
+
+    http.createServer(function(request, response) {
+        response.writeHead(200, { "Content-Type": "text/plain" });
+        response.write("Hello World");
+        response.end();
+    }).listen(8888);
+}
 
 /*node liri.js movie-this '<movie name here>':
     This will output the following information to your terminal/bash window:
@@ -53,24 +80,41 @@ switch (action) {
         It's on Netflix!
     You'll use the request package to retrieve data from the OMDB API. Like all of the in-class activities, the OMDB API requires an API key.*/
 
+function movieThis() {
+    var movieName = "";
+
+    //move over all of the entered words to 
+    for (var i = 3; i < input.length; i++) {
+        if (i > 3 && i < input.length) {
+            movieName = movieName + "+" + input[i];
+        } else {
+            movieName += input[i];
+        }
+    }
+    if (movieName === "") {
+        movieName = "Mr. Nobody";
+    }
+
+    var movieQueryURL = "http://www.omdbapi.com/?t=" + movieName + "&y=plot=short&apikey=" + omdb;
+
+    request(movieQueryURL, function(error, response, body) {
+        if (!error && response.statusCode === 200) {
+            var movieData = JSON.parse(body);
+            console.log("Title: " + movieData.Title + "\nRelease Year: " + movieData.Year);
+
+            for (var i = 0; i < movieData.Ratings.length; i++) {
+                console.log("Rating: " + movieData.Ratings[i].Source + " " + movieData.Ratings[i].Value)
+            }
+            console.log("Country Produced: " + movieData.Country + "\nLanguage: " + movieData.Language +
+                "\nActors: " + movieData.Actors + "\nPlot: " + movieData.Plot);
+        }
+    });
+}
 /*node liri.js do-what-it-says:
     Using the fs Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.:
         * It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
         * Feel free to change the text in that document to test out the feature for other commands.
 */
-
-function myTweets() {
-
-}
-
-function spotifyThisSong() {
-
-}
-
-function movieThis() {
-
-}
-
 function doWhatItSays() {
 
 }

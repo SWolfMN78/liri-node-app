@@ -1,4 +1,4 @@
-console.log('this is loaded');
+// console.log('this is loaded');
 
 exports.twitter = {
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -11,5 +11,7 @@ exports.spotify = {
     id: process.env.SPOTIFY_ID,
     secret: process.env.SPOTIFY_SECRET
 };
-//OMDB Key info @ b7e91b9d  - 
-//OMDB API Sample call @  http://www.omdbapi.com/?i=tt3896198&apikey=b7e91b9d
+
+exports.omdbApiKey = {
+    omdb_key: process.env.APIKEY
+};
