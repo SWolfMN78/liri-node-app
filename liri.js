@@ -34,17 +34,15 @@ function RunAction() {
     }
 }
 
-/* node liri.js my-tweets:
-    This will show your last 20 tweets and when they were created at in your terminal/bash window.*/
+/*Show upto the last 20 tweets and when they were created at in your terminal/bash window.*/
 function myTweets(action) {
-    if (action == undefined) { action = "DracoMutt78"; }
+    if (action == undefined) { action = "DracoMutt78"; } //setting action to be to be a defualt account, but the user can also pass in any other account
     var params = { screen_name: action };
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
         if (!error) {
             for (var i = 0; i < tweets.length; i++) {
                 console.log(tweets[i].created_at + " " + tweets[i].text);
             }
-            // console.log(tweets.length); //.created_at);
         }
     });
 }
@@ -70,7 +68,6 @@ function spotifyThisSong() {
     }
 
     // console.log(keys.spotify);
-
     spotify.search({ type: 'track', query: songName }, function(err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
@@ -119,6 +116,7 @@ function movieThis() {
 
     var movieQueryURL = "http://www.omdbapi.com/?t=" + movieName + "&y=plot=short&apikey=" + omdb;
 
+    //npm call and arrangement of data into information.
     request(movieQueryURL, function(error, response, body) {
         if (!error && response.statusCode === 200) {
             var movieData = JSON.parse(body);
@@ -129,14 +127,30 @@ function movieThis() {
             }
             console.log("Country Produced: " + movieData.Country + "\nLanguage: " + movieData.Language +
                 "\nActors: " + movieData.Actors + "\nPlot: " + movieData.Plot);
+        } else {
+            return console.log(error);
         }
     });
 }
+
 /*node liri.js do-what-it-says:
     Using the fs Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.:
         * It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
         * Feel free to change the text in that document to test out the feature for other commands.
 */
 function doWhatItSays() {
-
+    fs.readFile("random.txt", "utf8", function(error, data) {
+        if (error) {
+            return console.log(error);
+        }
+        //push the information into a variable holder and split the information on the ","
+        var txtData = data.split(",");
+        //push the information into a variable to be used.
+        action = txtData[0];
+        console.log(action);
+        action2 = txtData[1]; //trying to get the secondary information pushed into the call action...
+        console.log(action2);
+        //call the run function and pass in the action to perform the call.  - Look ma' Recursive!
+        RunAction(action + action2);
+    });
 }
