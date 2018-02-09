@@ -16,7 +16,7 @@ var omdb = (keys.omdbApiKey.omdb_key);
 
 RunAction();
 
-function RunAction() {
+function RunAction(act, act2) {
     //A switch command so that it takes commands
     switch (action) {
         case "my-tweets":
@@ -150,7 +150,5 @@ function doWhatItSays() {
         console.log(action);
         action2 = txtData[1]; //trying to get the secondary information pushed into the call action...
         console.log(action2);
-        //call the run function and pass in the action to perform the call.  - Look ma' Recursive!
-        RunAction(action + action2);
     });
 }
